@@ -17,9 +17,20 @@ class NewsSpider(scrapy.Spider):
                                                '..',
                                                'scrapy.cfg')
                                   )
-    config_parser.read(config_file)
-    mongodb_url = config_parser.get('settings', 'mongodb_url')
     ssl_file = os.path.join(config_dir, 'ssl.crt')
+
+    def __init__(self, name=None, **kwargs):
+        super(NewsSpider, self).__init__(self.name, **kwargs)
+        if os.environ.get('ENV') == 'cloud':
+            self.mongodb_url = os.environ.get('MONGODB_URL')
+        else:
+            config_file = os.path.abspath(os.path.join(self.config_dir,
+                                                       '..',
+                                                       '..',
+                                                       'scrapy.cfg'))
+            self.config_parser.read(config_file)
+            self.mongodb_url = self.config_parser.get(
+                'settings', 'mongodb_url')
 
     def _insert_bbc(self, response):
         """
