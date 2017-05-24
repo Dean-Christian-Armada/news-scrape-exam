@@ -6,6 +6,9 @@ from ConfigParser import SafeConfigParser
 
 
 class NewsSpider(scrapy.Spider):
+    """
+    @brief      Class for crawling on news like 'bbc' and 'theguardian'.
+    """
     name = 'news'
     config_parser = SafeConfigParser()
     config_dir = os.path.dirname(os.path.realpath(__file__))
@@ -23,7 +26,6 @@ class NewsSpider(scrapy.Spider):
         @brief      get the scraped data of bbc news, then inserting those
                     data as the collection's document
         """
-
         media = response.css('div.media')
         for x in range(0, len(media)):
             _media = media[x]
@@ -46,7 +48,7 @@ class NewsSpider(scrapy.Spider):
                 data['tags'] = tags
             if image:
                 data['image'] = image
-            self.collection.insert_one(data).inserted_id
+            self.__insert_data(data)
         return
 
     def _insert_theguardian(self, response):
@@ -54,7 +56,6 @@ class NewsSpider(scrapy.Spider):
         @brief      get the scraped data of theguardian news, then inserting
                                 those data as the collection's document
         """
-
         fc_item = response.css('div.fc-item__content')
         for x in range(0, len(fc_item)):
             _fc_item = fc_item[x]
@@ -69,8 +70,15 @@ class NewsSpider(scrapy.Spider):
                 data['url'] = url
             if tags:
                 data['tags'] = tags
-            self.collection.insert_one(data).inserted_id
+            self.__insert_data(data)
         return
+
+    def __insert_data(self, data):
+        """
+        @brief      to avoid redundancy on insertingto mongodb's collection
+        """
+        if not self.collection.find_one(data):
+            self.collection.insert_one(data).inserted_id
 
     def start_requests(self):
         urls = [
