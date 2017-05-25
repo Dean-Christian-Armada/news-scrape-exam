@@ -66,13 +66,13 @@ class NewsSpider(scrapy.Spider):
         fc_item = response.css('div.fc-item__content')
         for x in range(0, len(fc_item)):
             _fc_item = fc_item[x]
-            text = _fc_item.css('span.js-headline-text::text').extract_first()
+            title = _fc_item.css('span.js-headline-text::text').extract_first()
             url = _fc_item.css('a.fc-item__link::attr(href)').extract_first()
             tags = _fc_item.css('span.fc-item__kicker::text').extract_first()
 
             data = {}
-            if text:
-                data['text'] = text.strip()
+            if title:
+                data['title'] = title.strip()
             if url:
                 data['url'] = url
             if tags:
