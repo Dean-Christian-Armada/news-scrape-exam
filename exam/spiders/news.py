@@ -24,11 +24,7 @@ class NewsSpider(scrapy.Spider):
         if os.environ.get('ENV') == 'cloud':
             self.mongodb_url = os.environ.get('MONGODB_URL')
         else:
-            config_file = os.path.abspath(os.path.join(self.config_dir,
-                                                       '..',
-                                                       '..',
-                                                       'scrapy.cfg'))
-            self.config_parser.read(config_file)
+            self.config_parser.read(self.config_file)
             self.mongodb_url = self.config_parser.get(
                 'settings', 'mongodb_url')
 
